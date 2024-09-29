@@ -12,51 +12,35 @@ namespace Board
     /// </summary>
     public class GameBoard 
     {
-        private Dictionary<string, Vector2> _validBoardSlots; // Holds valid board slots and their positions in a canvas.
-        private readonly bool[,] _allBoardSlots; // 2D array representing all board slots where 1 represents a valid slot.
+        private readonly Dictionary<string, Vector2> _validBoardSlots; // Holds valid board slots and their positions in a canvas.
+        private readonly Slot[,] _allBoardSlots; // 2D array representing all board slots where 1 represents a valid slot.
         [SerializeField] private readonly int _numberOfRings; // Number of rings (squares) on the board.
         [SerializeField] private readonly int _boardSize; // Total size of the board, used for 2D array. Similar to the Length propery of an array.
         private float _spacing; // Spacing between slots.
 
         public int NumberOfRings { 
             get 
-            {
-                return _numberOfRings;
-            } 
+            { return _numberOfRings;} 
         }
         public int BoardSize
         {
             get
-            {
-                return _boardSize;
-            }
+            { return _boardSize;}
         }
-        public bool[,] AllBoardSlots
+        public Slot[,] AllBoardSlots
         {
             get
-            {
-                return _allBoardSlots;
-            }
+            { return _allBoardSlots;}
         }
         public Dictionary<string, Vector2> ValidBoardSlots {
             get
-            {
-                return _validBoardSlots;
-            }
-            private set
-            {
-                _validBoardSlots = value;
-            }
+            { return _validBoardSlots;}
         }
         public float SpacingBetweenSlots {
             get
-            {
-                return _spacing;
-            }
+            { return _spacing;}
             private set
-            {
-                _spacing = value;
-            }
+            { _spacing = value;}
         }
 
         /// <summary>
@@ -73,7 +57,7 @@ namespace Board
             _numberOfRings = numberOfRings;
             _validBoardSlots = new Dictionary<string, Vector2>();
             _boardSize = numberOfRings * 2 + 1;
-            _allBoardSlots = new bool[_boardSize, _boardSize];
+            _allBoardSlots = new Slot[_boardSize, _boardSize];
         }
 
         /// <summary>
@@ -162,6 +146,7 @@ namespace Board
         /// <param name="canvas">The RectTransform of the canvas the board will be displayed on.</param>
         public void InitializeBoard(RectTransform canvas)
         {
+            string slotCode = "";
             Vector2 canvasSize = canvas.sizeDelta;
             try
             {
@@ -170,16 +155,16 @@ namespace Board
                 {
                     for (int column = 0; column < BoardSize; column++)
                     {
-                        bool slotValue = IsValidSlot(row, column, BoardSize);
-                        if (slotValue)
+                        if (IsValidSlot(row, column, BoardSize))
                         {
-                            string slotCode = row.ToString() + "," + column.ToString();
+                            slotCode = row.ToString() + "," + column.ToString();
 
                             SpacingBetweenSlots = CalculateSpacingBetweenSlots(BoardSize, canvasSize);
                             Vector2 slotPosition = CalculateSlotPosition(row, column, BoardSize, canvasSize);
                             ValidBoardSlots.Add(slotCode, slotPosition);
                         }
-                        _allBoardSlots[row, column] = slotValue;
+                        AllBoardSlots[row, column] = new Slot(slotCode);
+                        Debug.Log(AllBoardSlots[row, column].OccupiedBy);
                     }
                 }
             }
