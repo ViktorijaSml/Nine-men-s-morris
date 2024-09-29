@@ -7,18 +7,18 @@ namespace Board
     /// </summary>
     public enum Ownership
     {
-        FirstPlayer,
-        SecondPlayer,
+        Player1,
+        Player2,
         Nobody
     }
 
     /// <summary>
     /// Represents a slot on the game board, containing information about its owner and unique key.
     /// </summary>
-    public class Slot
+    public class Slot 
     {
-        [SerializeField] private Ownership _occupiedBy;
-        [SerializeField] private string _slotKey;
+        private Ownership _occupiedBy;
+        private string _slotKey;
         public Ownership OccupiedBy
         {
             get { return _occupiedBy; }
@@ -40,7 +40,7 @@ namespace Board
         /// <summary>
         /// Resets the slot, marking it as unoccupied.
         /// </summary>
-        public void RemovePlayer() => OccupiedBy = Ownership.Nobody;
+        public void RemovePiece() => OccupiedBy = Ownership.Nobody;
 
         /// <summary>
         /// Checks if the slot is available for a player to move to (i.e., unoccupied).

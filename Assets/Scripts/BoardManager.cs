@@ -28,7 +28,6 @@ namespace Board
             instance = this;
         }
 
-
         /// <summary>
         /// Draws the game board on the canvas based on the provided GameBoard configuration.
         /// It sets up board slots and draws lines connecting them according to specific patterns.

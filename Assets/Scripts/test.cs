@@ -5,8 +5,7 @@ using UnityEngine;
 public class test : MonoBehaviour
 {
     GameBoard board;
-    [Button]
-    void Test()
+    void Start()
     {
         board = new GameBoard(3);
         BoardManager.instance.DrawBoard(board);

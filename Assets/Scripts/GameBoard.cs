@@ -13,9 +13,8 @@ namespace Board
     public class GameBoard 
     {
         private readonly Dictionary<string, Vector2> _validBoardSlots; // Holds valid board slots and their positions in a canvas.
-        private readonly Slot[,] _allBoardSlots; // 2D array representing all board slots where 1 represents a valid slot.
-        [SerializeField] private readonly int _numberOfRings; // Number of rings (squares) on the board.
-        [SerializeField] private readonly int _boardSize; // Total size of the board, used for 2D array. Similar to the Length propery of an array.
+        private readonly int _numberOfRings; // Number of rings (squares) on the board.
+        private readonly int _boardSize; // Total size of the board, used for 2D array. Similar to the Length propery of an array.
         private float _spacing; // Spacing between slots.
 
         public int NumberOfRings { 
@@ -26,11 +25,6 @@ namespace Board
         {
             get
             { return _boardSize;}
-        }
-        public Slot[,] AllBoardSlots
-        {
-            get
-            { return _allBoardSlots;}
         }
         public Dictionary<string, Vector2> ValidBoardSlots {
             get
@@ -57,7 +51,6 @@ namespace Board
             _numberOfRings = numberOfRings;
             _validBoardSlots = new Dictionary<string, Vector2>();
             _boardSize = numberOfRings * 2 + 1;
-            _allBoardSlots = new Slot[_boardSize, _boardSize];
         }
 
         /// <summary>
@@ -163,8 +156,6 @@ namespace Board
                             Vector2 slotPosition = CalculateSlotPosition(row, column, BoardSize, canvasSize);
                             ValidBoardSlots.Add(slotCode, slotPosition);
                         }
-                        AllBoardSlots[row, column] = new Slot(slotCode);
-                        Debug.Log(AllBoardSlots[row, column].OccupiedBy);
                     }
                 }
             }
@@ -185,7 +176,6 @@ namespace Board
         /// <returns>A Vector2 representing the position of the slot.</returns>
         private static Vector2 CalculateSlotPosition(int row, int column, int boardSize, Vector2 canvasSize)
         {
-            canvasSize = ClampCanvasSize(canvasSize, 1080f, 1920f);
             try
             {
                 CheckRowAndColumnValidity(row, column, boardSize);
@@ -209,21 +199,7 @@ namespace Board
         /// <param name="boardSize">The size of the board.</param>
         /// <param name="canvasSize">The size of the canvas.</param>
         /// <returns>The calculated spacing as a float.</returns>
-        private static float CalculateSpacingBetweenSlots(int boardSize, Vector2 canvasSize)
-        {
-            canvasSize = ClampCanvasSize(canvasSize, 1080f, 1920f);
-            return   Mathf.Min(canvasSize.x, canvasSize.y) / (boardSize + 1);
-        }
-
-        /// <summary>
-        /// Clamps the canvas size to ensure it falls within reasonable width and height limits.
-        /// </summary>
-        /// <param name="canvasSize">The current size of the canvas.</param>
-        /// <param name="maxHeight">The maximum height allowed for the canvas.</param>
-        /// <param name="maxWidth">The maximum width allowed for the canvas.</param>
-        /// <returns>A Vector2 containing the clamped canvas size.</returns>
-        private static Vector2 ClampCanvasSize(Vector2 canvasSize, float maxHeight, float maxWidth) => 
-            new Vector2(Mathf.Clamp(canvasSize.x, 100f, maxWidth), Mathf.Clamp(canvasSize.y, 100f, maxHeight));
+        private static float CalculateSpacingBetweenSlots(int boardSize, Vector2 canvasSize) => Mathf.Min(canvasSize.x, canvasSize.y) / (boardSize + 1);
 
         /// <summary>
         /// Determines whether a specific slot is valid based on its row and column indices.
