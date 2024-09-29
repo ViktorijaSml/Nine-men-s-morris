@@ -7,7 +7,7 @@ public class test : MonoBehaviour
     GameBoard board;
     void Start()
     {
-        board = new GameBoard(3);
+        board = new GameBoard(10);
         BoardManager.instance.DrawBoard(board);
     }
 
