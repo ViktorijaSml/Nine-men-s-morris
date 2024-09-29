@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Tools;
 
 namespace Board
 {
@@ -27,6 +28,7 @@ namespace Board
             instance = this;
         }
 
+
         /// <summary>
         /// Draws the game board on the canvas based on the provided GameBoard configuration.
         /// It sets up board slots and draws lines connecting them according to specific patterns.
@@ -35,13 +37,13 @@ namespace Board
         public void DrawBoard(GameBoard gameBoard)
         {
             canvasTransform = GameObject.FindGameObjectWithTag("Canvas").GetComponent<RectTransform>();
-            ComponentNullCheck(canvasTransform);
+            Utils.ComponentNullCheck(canvasTransform);
 
             slotPrefab = Resources.Load<GameObject>("Prefabs/Slot");
-            ComponentNullCheck(slotPrefab);
+            Utils.ComponentNullCheck(slotPrefab);
 
             lineRenderer = canvasTransform.GetComponentInChildren<UILineRenderer>();
-            ComponentNullCheck(lineRenderer);
+            Utils.ComponentNullCheck(lineRenderer);
 
             // Initialize Game board variable on the specified canvas
             gameBoard.InitializeBoard(canvasTransform);
@@ -163,7 +165,7 @@ namespace Board
             try
             {
                 string current2DIndex = boardSlots.FirstOrDefault(x => x.Value.Equals(lineRenderer.CurrentPosition)).Key;
-                indexes = GetIndexesFromKey(current2DIndex);
+                indexes = Utils.GetIndexesFromKey(current2DIndex);
             }
             catch (Exception e) 
             { 
@@ -172,16 +174,16 @@ namespace Board
             
             switch (direction)
             {
-                case Direction.Up:
+                case Direction.Up: //row + delta
                     indexes[0] += deltaDistance;
                     break;
-                case Direction.Down:
+                case Direction.Down: //row - delta
                     indexes[0] -= deltaDistance;
                     break;
-                case Direction.Left:
+                case Direction.Left: //column + delta
                     indexes[1] -= deltaDistance;
                     break;
-                case Direction.Right:
+                case Direction.Right: //column - delta
                     indexes[1] += deltaDistance;
                     break;
                 default:
@@ -189,7 +191,7 @@ namespace Board
                     return;
             }
 
-            string nextPointKey = $"{indexes[0]},{indexes[1]}";
+            string nextPointKey = Utils.ParseKeyFromIndexes(indexes);
             lineRenderer.DrawLine(boardSlots[nextPointKey]);
         }
 
@@ -201,37 +203,5 @@ namespace Board
         /// <param name="numberOfRings">The number of rings used to calculate the line thickness.</param>
         /// <returns>A float representing the calculated line thickness.</returns>
         private static float CalculateLineThickness(int numberOfRings) => 68.4f/(0.8f + numberOfRings);
-
-        /// <summary>
-        /// Checks if a given component is null and logs an error message if it is.
-        /// </summary>
-        /// <typeparam name="T">The type of the component being checked.</typeparam>
-        /// <param name="component">The component to check for null.</param>
-        private static void ComponentNullCheck<T> (T component)
-        {
-            if (component == null)
-            {
-                Debug.LogError($"Could not find {nameof(component)}");
-            }
-        }
-
-        /// <summary>
-        /// Extracts and returns the numerical indexes from a given string key formatted as "x,y".
-        /// If the key is invalid (null, empty, or improperly formatted), an error is logged.
-        /// </summary>
-        /// <param name="key">The string key to extract indexes from.</param>
-        /// <returns>An array of integers where indexes[0] is the "x" value and indexes[1] is the "y" value,
-        /// or null if the key is invalid.</returns>
-        private static int[] GetIndexesFromKey(string key)
-        {
-            //indexes[0] is left, indexes[1] is right number 
-            if (string.IsNullOrEmpty(key) || !key.Contains(','))
-            {
-                Debug.LogError($"Given key is invalid. Key: {key}");
-                return null;
-            }
-            string[] indexes = key.Split(',');
-            return new int[] { int.Parse(indexes[0]), int.Parse(indexes[1]) };
-        }   
     }
 }

@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Tools;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Board
@@ -10,7 +13,7 @@ namespace Board
     public class GameBoard 
     {
         private Dictionary<string, Vector2> _validBoardSlots; // Holds valid board slots and their positions in a canvas.
-        private readonly int[,] _allBoardSlots; // 2D array representing all board slots where 1 represents a valid slot.
+        private readonly bool[,] _allBoardSlots; // 2D array representing all board slots where 1 represents a valid slot.
         [SerializeField] private readonly int _numberOfRings; // Number of rings (squares) on the board.
         [SerializeField] private readonly int _boardSize; // Total size of the board, used for 2D array. Similar to the Length propery of an array.
         private float _spacing; // Spacing between slots.
@@ -28,7 +31,7 @@ namespace Board
                 return _boardSize;
             }
         }
-        public int[,] AllBoardSlots
+        public bool[,] AllBoardSlots
         {
             get
             {
@@ -70,9 +73,89 @@ namespace Board
             _numberOfRings = numberOfRings;
             _validBoardSlots = new Dictionary<string, Vector2>();
             _boardSize = numberOfRings * 2 + 1;
-            _allBoardSlots = new int[_boardSize, _boardSize];
+            _allBoardSlots = new bool[_boardSize, _boardSize];
         }
 
+        /// <summary>
+        /// Returns the 4 slots connected to the current slot (up, down, left, right).
+        /// </summary>
+        /// <param name="currentSlot">The key representing the current slot.</param>
+        /// <returns>Array of connected slots, or null if the slot is invalid. For a non-existing connection, returns null in the proper index of the array.</returns>
+        public string[] GetConnectedSlots(string currentSlot)
+        {
+            if (!ValidBoardSlots.ContainsKey(currentSlot))
+            {
+                Debug.LogError("Invalid parameter. You are checking connections for a slot that isn't valid.");
+                return null;
+            }
+
+            string[] connectedSlots = new string[4];
+            int[] centeredCurrentSlot = Utils.GetIndexesFromKey(Utils.TransformToCenteredCoords(currentSlot, BoardSize));
+            int deltaDistance = Mathf.Max(Mathf.Abs(centeredCurrentSlot[0]), Mathf.Abs(centeredCurrentSlot[1]));
+
+            for (int i = 0; i < 4; i++)
+            {
+                int[] temp = (int[])centeredCurrentSlot.Clone();
+
+                // Adjust temp based on direction (0: right, 1: left, 2: up, 3: down)
+                temp = centeredCurrentSlot.Contains(0)
+                    ? UpdateCoordsForZeroSlot(centeredCurrentSlot, temp, i, deltaDistance)
+                    : UpdateCoordsInAllDirections(temp, i, deltaDistance);
+
+                string key = Utils.TransformToOffsetedCoords(Utils.ParseKeyFromIndexes(temp), BoardSize);
+                if (ValidBoardSlots.ContainsKey(key))
+                {
+                    connectedSlots[i] = key;
+                }
+            }
+            return connectedSlots;
+        }
+
+        /// <summary>
+        /// Updates coordinates for non-zero slots (for general movement).
+        /// Adjusts coordinates based on the direction and delta.
+        /// </summary>
+        /// <param name="coords">Current coordinates of the slot.</param>
+        /// <param name="direction">Direction of movement (0: right, 1: left, 2: up, 3: down).</param>
+        /// <param name="delta">The distance to move.</param>
+        /// <returns> An array consisting of updated coordinates.
+
+        private static int[] UpdateCoordsInAllDirections(int[] coords, int direction, int delta)
+        {
+            switch (direction)
+            {
+                case 0: coords[0] += delta; break; // right
+                case 1: coords[0] -= delta; break; // left
+                case 2: coords[1] += delta; break; // up
+                case 3: coords[1] -= delta; break; // down
+            }
+            return coords;
+        }
+
+        /// <summary>
+        /// Updates coordinates for slots with one axis at zero (centered on an axis).
+        /// The movement depends on whether the x or y axis is zero.
+        /// </summary>
+        /// <returns> An array consisting of updated coordinates.
+        private static int[] UpdateCoordsForZeroSlot(int[] current, int[] coords, int direction, int delta)
+        { 
+            if (current[1] == 0) // Check if the slot is centered on the x-axis
+            {
+                if (direction == 0) coords[0] += 1;   // right  
+                else if (direction == 1) coords[0] -= 1; // left
+                else if (direction == 2) coords[1] += delta; // up
+                else if (direction == 3) coords[1] -= delta; // down
+            }
+            else // The slot is centered on the y-axis
+            {
+                if (direction == 0) coords[0] += delta;  // right
+                else if (direction == 1) coords[0] -= delta; // left
+                else if (direction == 2) coords[1] += 1;  // up
+                else if (direction == 3) coords[1] -= 1;  // down
+            }
+            return coords;
+        }
+       
         /// <summary>
         /// Initializes the board by determining valid slots and their positions based on the canvas size.
         /// </summary>
@@ -87,23 +170,18 @@ namespace Board
                 {
                     for (int column = 0; column < BoardSize; column++)
                     {
-                        if (IsValidSlot(row, column, BoardSize))
+                        bool slotValue = IsValidSlot(row, column, BoardSize);
+                        if (slotValue)
                         {
-                            _allBoardSlots[row, column] = 1;
-
                             string slotCode = row.ToString() + "," + column.ToString();
 
                             SpacingBetweenSlots = CalculateSpacingBetweenSlots(BoardSize, canvasSize);
                             Vector2 slotPosition = CalculateSlotPosition(row, column, BoardSize, canvasSize);
                             ValidBoardSlots.Add(slotCode, slotPosition);
                         }
-                        else
-                        {
-                            _allBoardSlots[row, column] = 0;
-                        }
+                        _allBoardSlots[row, column] = slotValue;
                     }
                 }
-                this.ValidBoardSlots = _validBoardSlots;
             }
             catch (Exception e) 
             {
@@ -182,10 +260,10 @@ namespace Board
 
             if (!(row == (boardSize - 1) / 2 && row == column)) //exclude the slot in the middle
             {
-                return (row == column || row + column == boardSize - 1 || //include the diagonal from upper right to bottom left corner
-                            (boardSize - 1) / 2 == row || (boardSize - 1) / 2 == column); //include the diagonal from upper left to bottom right corner
+                return (row == column || row + column == boardSize - 1 || //include diagonals
+                           (boardSize - 1) / 2 == row || (boardSize - 1) / 2 == column); //include crosses
             }
-            else return false;
+            return false;
         }
 
         /// <summary>
