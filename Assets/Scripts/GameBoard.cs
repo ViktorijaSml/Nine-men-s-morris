@@ -96,7 +96,6 @@ namespace Board
         /// <param name="direction">Direction of movement (0: right, 1: left, 2: up, 3: down).</param>
         /// <param name="delta">The distance to move.</param>
         /// <returns> An array consisting of updated coordinates.
-
         private static int[] UpdateCoordsInAllDirections(int[] coords, int direction, int delta)
         {
             switch (direction)

@@ -24,11 +24,12 @@ namespace Tools
             ComponentNullCheck(parentObj);
             return parentObj.transform.Find($"Slot({slotKey})").GetComponent<Slot>();
         }
+        
         /// <summary>
         /// Checks if a given component is null and logs an error message if it is.
         /// </summary>
         /// <typeparam name="T">The type of the component being checked.</typeparam>
-        /// <param name="component">The component to check for null.</param>
+        /// <param name="component">The component to check for null.</param> 
         public static void ComponentNullCheck<T>(T component)
         {
             if (component == null)

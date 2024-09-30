@@ -33,7 +33,7 @@ namespace GamePlay
             get { return _currentState; }
             private set { _currentState = value;}
         }
-        private int TotalPieces; 
+        public int TotalPieces; 
         void Start()
         {
             InitializeVariables();
@@ -62,8 +62,9 @@ namespace GamePlay
                     break;
             }
         }
+
         /// <summary>
-        /// Handles the logic for placing pieces on the board.
+        /// Handles the logic for placing pieces phase.
         /// </summary>
         private void HandlePiecePlacement()
         {
@@ -112,6 +113,13 @@ namespace GamePlay
             }
         }
 
+        /// <summary>
+        /// Handles the logic for removing an opponent's piece from the game board. 
+        /// It performs a raycast from the mouse position to detect the selected slot 
+        /// and updates the UI to indicate that a piece is being removed. 
+        /// If the selected slot is not available and is occupied by an opponent's piece, 
+        /// it removes that piece from the slot. 
+        /// </summary>
         private void RemovePiece()
         {
             RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
@@ -190,7 +198,7 @@ namespace GamePlay
         }
 
         /// <summary>
-        /// Handles the logic for moving pieces when a player has only 3 pieces and can "fly".
+        /// Handles the logic for moving pieces during the Flying phase.
         /// </summary>
         void HandleFlying()
         {

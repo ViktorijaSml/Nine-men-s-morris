@@ -196,8 +196,6 @@ namespace Board
 
         /// <summary>
         /// Calculates the thickness of a line based on the number of rings in the game board.
-        /// The thickness is determined using the quadratic polynomial equation:
-        /// y = 1.25 * numberOfRings^2 - 15 * numberOfRings + 51.75.
         /// </summary>
         /// <param name="numberOfRings">The number of rings used to calculate the line thickness.</param>
         /// <returns>A float representing the calculated line thickness.</returns>
