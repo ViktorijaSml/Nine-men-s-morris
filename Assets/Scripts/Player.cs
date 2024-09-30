@@ -11,7 +11,7 @@ namespace PlayerData
         private string _playerName;
         private int _numberOfPieces;
         private int _numberOfAvailablePieces;
-
+        private Color _pieceColor;
         public string PlayerName
         {
             get { return _playerName; }
@@ -27,12 +27,18 @@ namespace PlayerData
             get { return _numberOfAvailablePieces; }
             set { _numberOfAvailablePieces = value; }
         }
+        public Color PieceColor
+        {
+            get { return _pieceColor; }
+            set { _pieceColor = value; }
+        }
         public Player(Ownership playerName, int numberOfPieces)
         {
             PlayerName = playerName.ToString();
             NumberOfPieces = numberOfPieces;
             NumberOfAvailablePieces = numberOfPieces;
         }
+
 
         /// <summary>
         /// Decreases the player's available pieces by 1 when they place a piece on the board.

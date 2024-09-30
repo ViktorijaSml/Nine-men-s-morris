@@ -42,7 +42,7 @@ namespace Board
         /// </summary>
         /// <param name="numberOfRings">The number of rings on the board. Must be at least 1.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when numberOfRings is less than 1.</exception>
-        public GameBoard(int numberOfRings = 2) 
+        public GameBoard(int numberOfRings = 3) 
         {
             if (numberOfRings < 1)
             {

@@ -1,13 +1,29 @@
-using System;
-using Unity.VisualScripting;
+using Board;
 using UnityEngine;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 namespace Tools
 {
-
+    /// <summary>
+    /// The Utils class provides utility methods for managing and interacting with game components,
+    /// including slot retrieval, coordinate transformation, and component validation. 
+    /// It offers custom methods that help manage the game.
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Retrieves a Slot object from the Canvas by its key. The key corresponds to the slot's name.
+        /// If the slotKey is null, returns null.
+        /// </summary>
+        /// <param name="slotKey">The key/name of the slot object.</param>
+        /// <returns>The Slot component corresponding to the given key, or null if not found.</returns>
+        public static Slot GetSlotObject(string slotKey)
+        {
+            if (slotKey == null)
+                return null;
+            GameObject parentObj = GameObject.FindGameObjectWithTag("Canvas");
+            ComponentNullCheck(parentObj);
+            return parentObj.transform.Find($"Slot({slotKey})").GetComponent<Slot>();
+        }
         /// <summary>
         /// Checks if a given component is null and logs an error message if it is.
         /// </summary>
@@ -17,7 +33,7 @@ namespace Tools
         {
             if (component == null)
             {
-                Debug.LogError($"Could not find {nameof(component)}");
+                Debug.LogError($"Could not find {typeof(T).ToString()}");
             }
         }
 
